@@ -20,10 +20,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest .
 
       - name: Push image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest
 
       - name: Deploy to Docker Swarm via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -33,10 +33,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker service update \
-              --image ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest \
+              --image ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest \
               --force yii2_app_service || \
             docker service create \
               --name yii2_app_service \
               --replicas 1 \
               --publish 9000:80 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest
+              ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest
