@@ -117,6 +117,72 @@ jobs:
 
 ---
 
+
+# Yii2 Application Deployment with Docker Swarm & GitHub Actions
+
+## Overview
+
+Quickly deploy a Yii2 PHP app with Docker Swarm on AWS EC2, using NGINX as a reverse proxy and GitHub Actions for CI/CD.
+
+---
+
+## 1. Dockerizing Yii2
+
+- Uses `php:8.3-apache`, installs needed extensions.
+- App served from `/web`.
+- Build image:
+  ```bash
+  docker build -t raja7977/yii2-app:latest .
+  ```
+
+---
+
+## 2. Deploy on Docker Swarm
+
+- Init Swarm on EC2, deploy service:
+  ```bash
+  docker service create --name yii2_app_service --replicas 1 --publish 9000:80 raja7977/yii2-app:latest
+  ```
+- Update with:
+  ```bash
+  docker service update --image raja7977/yii2-app:latest --force yii2_app_service
+  ```
+
+---
+
+## 3. NGINX Reverse Proxy
+
+- NGINX forwards port 80 to 9000.
+- Example config:
+  ```nginx
+  server {
+      listen 80;
+      server_name your-ec2-public-ip;
+      location / { proxy_pass http://localhost:9000; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; }
+  }
+  ```
+
+---
+
+## 4. CI/CD (GitHub Actions)
+
+- On push to `main`, workflow builds, pushes image to Docker Hub, deploys via SSH.
+
+---
+
+## Screenshots
+
+### Yii2 Default Page
+![Yii2 App Welcome](images/image1.png)
+*Default Yii2 app landing page after deployment.*
+
+### Docker Swarm Deployment
+![Docker Swarm Terminal](images/image2.png)
+*AWS EC2 terminal showing Docker image build, push, and Swarm service update.*
+
+---
+
+
 ## Summary
 
 ✅ Dockerized Yii2 app  
