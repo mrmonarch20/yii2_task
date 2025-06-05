@@ -12,7 +12,7 @@ This project demonstrates how to containerize a Yii2 PHP application, deploy it 
 - Installs required PHP extensions (`pdo`, `mbstring`, `gd`, etc.).
 - Copies Yii2 source code into the container.
 - Configures Apache to serve the app from `/web`.
-- Docker image is built and tagged as `raja7977/yii2-app:latest`.
+- Docker image is built and tagged as `raja7977/yii2-app:latest .`
 
 ### Docker Build Command
 
@@ -90,13 +90,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Docker Hub login
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest .
 
       - name: Push image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest
 
       - name: Deploy to Docker Swarm via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -106,7 +106,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker service update \
-              --image ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest \
+              --image ${{ secrets.DOCKERH_USERNAME }}/yii2-app:latest \
               --force yii2_app_service || \
             docker service create \
               --name yii2_app_service \
