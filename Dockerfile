@@ -1,4 +1,4 @@
-official PHP image with Apache
+#official PHP image with Apache
 FROM php:8.3-apache
 
 # Install system dependencies
