@@ -1,0 +1,15 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        name: ['docker.io', 'docker-compose', 'nginx', 'git', 'php-cli', 'php-mbstring', 'php-xml', 'curl']
+        state: present
+        update_cache: yes
+
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
