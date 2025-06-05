@@ -1,0 +1,39 @@
+name: Build and Deploy Yii2 to Docker Swarm
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Docker Hub login
+        run: echo "${{ secrets.DOCKERHUB_PASS }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest .
+
+      - name: Push image to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest
+
+      - name: Deploy to Docker Swarm via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker service update \
+              --image ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest \
+              --force yii2_app_service || \
+            docker service create \
+              --name yii2_app_service \
+              --replicas 1 \
+              --publish 9000:80 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/yii2-app:latest
