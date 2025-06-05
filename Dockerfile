@@ -21,7 +21,7 @@ WORKDIR /var/www/html
 # Copy Yii2 code to container
 COPY . /var/www/html
 
-document root
+#document root
 ENV APACHE_DOCUMENT_ROOT /var/www/html/web
 
 # Update Apache config
